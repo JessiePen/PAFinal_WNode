@@ -19,7 +19,9 @@ public class Worker {
                 String input;
                 while ((input = in.readLine()) != null) {
                     String[] task = input.split(",");
-                    System.out.println("Received task range from " + task[0] + "aaa " + " to " + task[0] + "ZZZ");
+                    int prefixSize = task[0].length();
+                    System.out.println("Received task range from " + task[0] + (prefixSize == 1? "aaaa ":"aaa ") + " to "
+                            + task[0] + (prefixSize == 1? "ZZZZ ":"ZZZ "));
                     String res = crack(task[0], task[1]);
 //                    out.write(res);
                     out.println(res);
@@ -46,30 +48,40 @@ public class Worker {
         }
         String allChars = sb.toString();
 
-        StringBuilder password = new StringBuilder();
-        password.append(start.charAt(0));
-        password.append(start.charAt(1));
+        StringBuilder password;
+        password = new StringBuilder(start);
+        int loopTimes = 5 - password.length();
 
-        for (int j=0;j<52;j++){
-            password.append(allChars.charAt(j));
-            for (int k=0;k<52;k++){
-                password.append(allChars.charAt(k));
-                for(int l=0;l<52;l++){
-                    password.append(allChars.charAt(l));
-                    if(toMD5(password.toString()).equals(hash)){
-                        long time = System.currentTimeMillis();
-                        password.append(",");
-                        password.append(time);
-                        return password.toString();
-                    }
-                    password.deleteCharAt(password.length()-1);
-                }
-                password.deleteCharAt(password.length()-1);
+        if(loopTimes == 3) {
+            if (loop3Times(hash, allChars, password)) return password.toString();
+        } else if(loopTimes == 4) {
+            for (int j = 0; j < 52; j++) {
+                password.append(allChars.charAt(j));
+                if (loop3Times(hash, allChars, password)) return password.toString();
+                password.deleteCharAt(password.length() - 1);
             }
-            password.deleteCharAt(password.length()-1);
         }
-        long time = System.currentTimeMillis();
-        return "101 Not Found"+","+time;
+        return "101 Not Found";
+
+    }
+
+    private static boolean loop3Times(String hash, String allChars, StringBuilder password) {
+        for (int k = 0; k < 52; k++) {
+            password.append(allChars.charAt(k));
+            for (int l = 0; l < 52; l++) {
+                password.append(allChars.charAt(l));
+                for(int h  = 0; h < 52; h++) {
+                    password.append(allChars.charAt(h));
+                    if (toMD5(password.toString()).equals(hash)) {
+                        return true;
+                    }
+                    password.deleteCharAt(password.length() - 1);
+                }
+                password.deleteCharAt(password.length() - 1);
+            }
+            password.deleteCharAt(password.length() - 1);
+        }
+        return false;
     }
 
     public static String toMD5(String plainText){
