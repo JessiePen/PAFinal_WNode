@@ -18,14 +18,15 @@ public class Worker {
             ) {
                 String input;
                 while ((input = in.readLine()) != null) {
+                    long recvTime = System.currentTimeMillis();
                     String[] task = input.split(",");
                     int prefixSize = task[0].length();
                     System.out.println("Received task range from " + task[0] + (prefixSize == 1? "aaaa ":"aaa ") + " to "
                             + task[0] + (prefixSize == 1? "ZZZZ ":"ZZZ "));
-                    String res = crack(task[0], task[1]);
+                    String res = crack(task[0], task[1],recvTime);
 //                    out.write(res);
                     out.println(res);
-                    if (!res.equals("101 Not Found")) {
+                    if (!res.substring(0,3).equals("101")) {
                         System.out.println("Password found");
                     }else{
                         System.out.println("No matching password in this range");
@@ -37,7 +38,7 @@ public class Worker {
         }
     }
 
-    public static String crack(String start, String hash){
+    public static String crack(String start, String hash,long recvTime){
 
         StringBuilder sb = new StringBuilder();
         for(int i='a';i<='z';i++){
@@ -54,7 +55,7 @@ public class Worker {
 
         if(loopTimes == 3) {
             if (loop3Times(hash, allChars, password)){
-                long time = System.currentTimeMillis();
+                long time = System.currentTimeMillis()-recvTime;
                 password.append(",");
                 password.append(time);
                 return password.toString();
@@ -63,7 +64,7 @@ public class Worker {
             for (int j = 0; j < 52; j++) {
                 password.append(allChars.charAt(j));
                 if (loop3Times(hash, allChars, password)){
-                    long time = System.currentTimeMillis();
+                    long time = System.currentTimeMillis()-recvTime;
                     password.append(",");
                     password.append(time);
                     return password.toString();
@@ -71,7 +72,7 @@ public class Worker {
                 password.deleteCharAt(password.length() - 1);
             }
         }
-        long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis()-recvTime;
         return "101 Not Found,"+time;
 
     }
