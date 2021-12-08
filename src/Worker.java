@@ -53,15 +53,26 @@ public class Worker {
         int loopTimes = 5 - password.length();
 
         if(loopTimes == 3) {
-            if (loop3Times(hash, allChars, password)) return password.toString();
+            if (loop3Times(hash, allChars, password)){
+                long time = System.currentTimeMillis();
+                password.append(",");
+                password.append(time);
+                return password.toString();
+            }
         } else if(loopTimes == 4) {
             for (int j = 0; j < 52; j++) {
                 password.append(allChars.charAt(j));
-                if (loop3Times(hash, allChars, password)) return password.toString();
+                if (loop3Times(hash, allChars, password)){
+                    long time = System.currentTimeMillis();
+                    password.append(",");
+                    password.append(time);
+                    return password.toString();
+                }
                 password.deleteCharAt(password.length() - 1);
             }
         }
-        return "101 Not Found";
+        long time = System.currentTimeMillis();
+        return "101 Not Found,"+time;
 
     }
 
