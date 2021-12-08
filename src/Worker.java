@@ -57,6 +57,9 @@ public class Worker {
                 for(int l=0;l<52;l++){
                     password.append(allChars.charAt(l));
                     if(toMD5(password.toString()).equals(hash)){
+                        long time = System.currentTimeMillis();
+                        password.append(",");
+                        password.append(time);
                         return password.toString();
                     }
                     password.deleteCharAt(password.length()-1);
@@ -65,7 +68,8 @@ public class Worker {
             }
             password.deleteCharAt(password.length()-1);
         }
-        return "101 Not Found";
+        long time = System.currentTimeMillis();
+        return "101 Not Found"+","+time;
     }
 
     public static String toMD5(String plainText){
